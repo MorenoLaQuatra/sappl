@@ -32,10 +32,18 @@ SAPPL (Simple Audio Pre-Processing Library) is a toolkit for audio preprocessing
 
 ## Installation
 
-Install the required dependencies from `requirements.txt`:
+Install the package directly from PyPI using pip:
 
 ```bash
 pip install sappl
+```
+
+or clone the repository and install it locally:
+
+```bash
+git clone https://github.com/MorenoLaQuatra/sappl
+cd sappl
+pip install .
 ```
 
 ---
