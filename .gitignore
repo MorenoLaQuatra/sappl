@@ -1,0 +1,136 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual environment
+venv/
+env/
+.venv/
+.venv.bak/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# VS Code and IDE settings
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Python cache and egg files
+*.egg-info/
+*.egg
+.eggs/
+*.pyo
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+.installed.cfg
+*.egg-info/
+*.manifest
+pip-wheel-metadata/
+share/python-wheels/
+*.whl
+
+# PyInstaller
+# Usually these files are written by a python script from a binary distribution.
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+.pyre/
+
+# pytest cache
+.pytest_cache/
+
+# Type stubs
+typings/
+
+# Profiling data
+.prof
+
+# Logs and databases
+*.log
+*.sqlite3
+*.db
+*.db-journal
+*.sql
+
+# Audio processing files
+tests/test_data/output.wav
+tests/test_data/*.wav
+*.mp3
+*.flac
+*.ogg
+*.opus
+*.m4a
+
+# Docker
+Dockerfile
+*.container
+*.tar
+*.lock
+
+# Environments and tools
+.env
+.env.*
+.envrc
+*.env
+*.ini
+*.yaml
+*.yml
+*.lock
+*.toml
+
+# Editor backups and swaps
+*~
+*.bak
+*.swp
+*.swo
+*.swn
+
+# IPython and Jupyter Notebook files
+*.ipynb
+*.ipynb_checkpoints/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# PyCharm project settings
+.idea/
+*.iml
+
+# Visual Studio Code
+.vscode/
+.vscode-test/
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
