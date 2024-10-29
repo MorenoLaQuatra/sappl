@@ -79,11 +79,21 @@ Performs transformations like Short-Time Fourier Transform (STFT) and inverse ST
 
 #### Functions
 
-- **`stft(audio, n_fft=2048, hop_length=512, win_length=None)`**: Computes the STFT and returns a `(T, F)` matrix.
-- **`istft(stft_matrix, hop_length=512, win_length=None)`**: Reconstructs audio from an STFT matrix.
-- **`magphase(stft_matrix)`**: Separates the magnitude and phase.
-- **`compute_mel_spectrogram(audio, sample_rate=16000, n_fft=2048, hop_length=512, n_mels=128, f_min=0.0, f_max=None)`**: Computes the Mel spectrogram in dB scale.
-- **`reconstruct_waveform(magnitude, phase, hop_length=512, win_length=None)`**: Reconstructs the waveform from magnitude and phase spectrograms.
+- **`stft(audio, n_fft=2048, hop_length=512, win_length=None, center=False, pad_mode='reflect')`**: 
+   Computes the STFT of an audio signal and returns a `(T, F)` matrix. If `center=True`, pads the signal so each frame is centered around its FFT window. The `pad_mode` parameter defines the padding mode when `center=True`.
+
+- **`istft(stft_matrix, hop_length=512, win_length=None, center=False)`**: 
+   Reconstructs audio from an STFT matrix, with the option to trim padding if `center=True`.
+
+- **`magphase(stft_matrix)`**: 
+   Separates the magnitude and phase components of the STFT matrix, returning both in `(T, F)` format.
+
+- **`compute_mel_spectrogram(audio, sample_rate=16000, n_fft=2048, hop_length=512, n_mels=128, f_min=0.0, f_max=None, center=False, pad_mode='reflect')`**: 
+   Computes the Mel spectrogram of the audio signal in dB scale. If `center=True`, pads the signal so each frame is centered around its FFT window, with `pad_mode` controlling the padding style.
+
+- **`reconstruct_waveform(magnitude, phase, hop_length=512, win_length=None, center=False)`**: 
+   Reconstructs the waveform from magnitude and phase spectrograms, with the option to trim padding when `center=True`.
+
 
 #### Example
 
@@ -91,20 +101,29 @@ Performs transformations like Short-Time Fourier Transform (STFT) and inverse ST
 from sappl.transform import stft, istft, magphase, compute_mel_spectrogram
 
 # Compute STFT
-stft_matrix = stft(audio_data)
+from sappl.transform import stft, istft, magphase, compute_mel_spectrogram, reconstruct_waveform
+from sappl.io import load_audio
+
+# Load audio data
+audio_data = load_audio("path/to/audio_file.wav", sample_rate=16000, mono=True)
+
+# Compute STFT with center=False (no padding) and default hop length and FFT size
+stft_matrix = stft(audio_data, center=False)
 print("STFT shape:", stft_matrix.shape)
 
 # Separate magnitude and phase
 magnitude, phase = magphase(stft_matrix)
 print("Magnitude shape:", magnitude.shape)
+print("Phase shape:", phase.shape)
 
-# Compute Mel spectrogram
-mel_spec = compute_mel_spectrogram(audio_data, sample_rate=16000)
+# Compute Mel spectrogram with center=False to avoid padding
+mel_spec = compute_mel_spectrogram(audio_data, sample_rate=16000, center=False)
 print("Mel spectrogram shape:", mel_spec.shape)
 
-# Reconstruct waveform from magnitude and phase
-reconstructed_audio = reconstruct_waveform(magnitude, phase, hop_length=512)
+# Reconstruct waveform from magnitude and phase with center=False
+reconstructed_audio = reconstruct_waveform(magnitude, phase, hop_length=512, center=False)
 print("Reconstructed audio shape:", reconstructed_audio.shape)
+
 ```
 
 ---

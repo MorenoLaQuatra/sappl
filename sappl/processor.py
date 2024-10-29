@@ -24,7 +24,9 @@ class AudioProcessor:
                  win_length=None, 
                  n_mels=128, 
                  f_min=0.0, 
-                 f_max=None):
+                 f_max=None, 
+                 center=False, 
+                 pad_mode='reflect'):
         """
         Initializes the AudioProcessor with default configurations.
 
@@ -39,6 +41,8 @@ class AudioProcessor:
             n_mels (int): Number of Mel bands for Mel spectrograms. Default is 128.
             f_min (float): Minimum frequency for Mel spectrograms. Default is 0.0.
             f_max (float): Maximum frequency for Mel spectrograms. Default is None (defaults to half the sample rate).
+            center (bool): If True, pads the signal so each frame is centered around its FFT window. Default is False.
+            pad_mode (str): Padding mode if `center=True`. Default is 'reflect'.
         """
         self.sample_rate = sample_rate
         self.max_length = max_length
@@ -50,6 +54,8 @@ class AudioProcessor:
         self.n_mels = n_mels
         self.f_min = f_min
         self.f_max = f_max or sample_rate / 2
+        self.center = center
+        self.pad_mode = pad_mode
 
     # --- I/O Operations ---
     def load_audio(self, file_path, mono=True):
@@ -60,16 +66,15 @@ class AudioProcessor:
 
     # --- Transformations ---
     def stft(self, audio):
-        return transform.stft(audio, n_fft=self.n_fft, hop_length=self.hop_length, win_length=self.win_length)
+        return transform.stft(audio, n_fft=self.n_fft, hop_length=self.hop_length, win_length=self.win_length, center=self.center, pad_mode=self.pad_mode)
 
     def istft(self, stft_matrix):
-        return transform.istft(stft_matrix, hop_length=self.hop_length, win_length=self.win_length)
+        return transform.istft(stft_matrix, hop_length=self.hop_length, win_length=self.win_length, center=self.center)
 
     def magphase(self, stft_matrix):
         return transform.magphase(stft_matrix)
 
     def compute_mel_spectrogram(self, audio):
-        print("compute_mel_spectrogram with n_mels:", self.n_mels)
         return transform.compute_mel_spectrogram(
             audio,
             sample_rate=self.sample_rate,
@@ -77,7 +82,9 @@ class AudioProcessor:
             hop_length=self.hop_length,
             n_mels=self.n_mels,
             f_min=self.f_min,
-            f_max=self.f_max
+            f_max=self.f_max,
+            center=self.center,
+            pad_mode=self.pad_mode
         )
 
     def reconstruct_waveform(self, magnitude, phase):
@@ -85,7 +92,8 @@ class AudioProcessor:
             magnitude,
             phase,
             hop_length=self.hop_length,
-            win_length=self.win_length
+            win_length=self.win_length,
+            center=self.center
         )
 
     # --- Utility Functions ---
@@ -147,7 +155,7 @@ class AudioProcessor:
 
 if __name__ == "__main__":
     # Example usage
-    processor = AudioProcessor(sample_rate=16000, max_length=5.0, n_fft=1024, hop_length=256, n_mels=40)
+    processor = AudioProcessor(sample_rate=16000, max_length=5.0, n_fft=1024, hop_length=256, n_mels=40, center=False)
 
     # Load audio
     audio = processor.load_audio("../samples/music_sample.wav")

@@ -8,7 +8,7 @@ except ImportError:
     TORCH_AVAILABLE = False
 
 
-def stft(audio, n_fft=2048, hop_length=512, win_length=None):
+def stft(audio, n_fft=2048, hop_length=512, win_length=None, center=False, pad_mode='reflect'):
     """
     Computes the Short-Time Fourier Transform (STFT) of the audio signal.
 
@@ -17,15 +17,17 @@ def stft(audio, n_fft=2048, hop_length=512, win_length=None):
         n_fft (int): Number of FFT components. Default is 2048.
         hop_length (int): Number of audio samples between successive STFT columns. Default is 512.
         win_length (int): Each frame of audio will be windowed by `win_length`. Default is `n_fft`.
+        center (bool): If True, pads the signal so each frame is centered around its FFT window. Default is False.
+        pad_mode (str): Padding mode if `center=True`, ignored otherwise. Default is 'reflect'. 
 
     Returns:
         np.ndarray: STFT of shape (T, F), where T is the number of time steps, and F is the number of frequency bins.
     """
-    stft_matrix = librosa.stft(y=audio, n_fft=n_fft, hop_length=hop_length, win_length=win_length)
+    stft_matrix = librosa.stft(y=audio, n_fft=n_fft, hop_length=hop_length, win_length=win_length, center=center, pad_mode=pad_mode)
     return stft_matrix.T  # Transpose to (T, F)
 
 
-def istft(stft_matrix, hop_length=512, win_length=None):
+def istft(stft_matrix, hop_length=512, win_length=None, center=False):
     """
     Computes the inverse Short-Time Fourier Transform (iSTFT) to reconstruct the time-domain audio signal.
 
@@ -33,11 +35,13 @@ def istft(stft_matrix, hop_length=512, win_length=None):
         stft_matrix (np.ndarray): STFT matrix with shape (T, F).
         hop_length (int): Number of audio samples between successive STFT columns. Default is 512.
         win_length (int): Each frame of audio will be windowed by `win_length`. Default is None.
+        center (bool): If True, the signal is trimmed so that frames align with original STFT frames. Default is False.
 
     Returns:
         np.ndarray: Reconstructed audio time series.
     """
-    return librosa.istft(stft_matrix.T, hop_length=hop_length, win_length=win_length)  # Transpose back to (F, T) for iSTFT
+    return librosa.istft(stft_matrix.T, hop_length=hop_length, win_length=win_length, center=center)  # Transpose back to (F, T) for iSTFT
+
 
 
 def magphase(stft_matrix):
@@ -110,7 +114,7 @@ def db_to_amplitude(spectrogram_db, ref=1.0):
     return librosa.db_to_amplitude(spectrogram_db, ref=ref)
 
 
-def compute_mel_spectrogram(audio, sample_rate=16000, n_fft=2048, hop_length=512, n_mels=128, f_min=0.0, f_max=None):
+def compute_mel_spectrogram(audio, sample_rate=16000, n_fft=2048, hop_length=512, n_mels=128, f_min=0.0, f_max=None, center=False, pad_mode='reflect'):
     """
     Computes the Mel spectrogram of the audio signal.
 
@@ -122,6 +126,8 @@ def compute_mel_spectrogram(audio, sample_rate=16000, n_fft=2048, hop_length=512
         n_mels (int): Number of Mel bands. Default is 128.
         f_min (float): Minimum frequency in Hz. Default is 0.0.
         f_max (float): Maximum frequency in Hz. Default is None (half the sampling rate).
+        center (bool): If True, pads the signal so each frame is centered around its FFT window. Default is False.
+        pad_mode (str): Padding mode if `center=True`, ignored otherwise. Default is 'reflect'.
 
     Returns:
         np.ndarray: Mel spectrogram in dB scale (T, F), where T is time steps and F is Mel bins.
@@ -133,12 +139,15 @@ def compute_mel_spectrogram(audio, sample_rate=16000, n_fft=2048, hop_length=512
         hop_length=hop_length,
         n_mels=n_mels,
         fmin=f_min,
-        fmax=f_max or sample_rate / 2
+        fmax=f_max or sample_rate / 2,
+        center=center,
+        pad_mode=pad_mode
     )
     return librosa.power_to_db(mel_spectrogram, ref=np.max).T  # Convert to dB and transpose to (T, F)
 
 
-def reconstruct_waveform(magnitude, phase, hop_length=512, win_length=None):
+
+def reconstruct_waveform(magnitude, phase, hop_length=512, win_length=None, center=False):
     """
     Reconstructs the waveform from magnitude and phase components.
 
@@ -147,6 +156,7 @@ def reconstruct_waveform(magnitude, phase, hop_length=512, win_length=None):
         phase (np.ndarray): Phase spectrogram (T, F).
         hop_length (int): Number of audio samples between successive STFT columns. Default is 512.
         win_length (int): Each frame of audio will be windowed by `win_length`. Default is None.
+        center (bool): If True, pads the signal so each frame is centered around its FFT window. Default is False.
 
     Returns:
         np.ndarray: Reconstructed audio waveform.
@@ -159,7 +169,7 @@ def reconstruct_waveform(magnitude, phase, hop_length=512, win_length=None):
     stft_matrix = magnitude * np.exp(1j * phase)
 
     # Perform inverse STFT to get back the waveform
-    return librosa.istft(stft_matrix, hop_length=hop_length, win_length=win_length)
+    return librosa.istft(stft_matrix, hop_length=hop_length, win_length=win_length, center=center)
 
 
 if __name__ == "__main__":
