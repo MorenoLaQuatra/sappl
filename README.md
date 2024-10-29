@@ -83,6 +83,7 @@ Performs transformations like Short-Time Fourier Transform (STFT) and inverse ST
 - **`istft(stft_matrix, hop_length=512, win_length=None)`**: Reconstructs audio from an STFT matrix.
 - **`magphase(stft_matrix)`**: Separates the magnitude and phase.
 - **`compute_mel_spectrogram(audio, sample_rate=16000, n_fft=2048, hop_length=512, n_mels=128, f_min=0.0, f_max=None)`**: Computes the Mel spectrogram in dB scale.
+- **`reconstruct_waveform(magnitude, phase, hop_length=512, win_length=None)`**: Reconstructs the waveform from magnitude and phase spectrograms.
 
 #### Example
 
@@ -100,6 +101,10 @@ print("Magnitude shape:", magnitude.shape)
 # Compute Mel spectrogram
 mel_spec = compute_mel_spectrogram(audio_data, sample_rate=16000)
 print("Mel spectrogram shape:", mel_spec.shape)
+
+# Reconstruct waveform from magnitude and phase
+reconstructed_audio = reconstruct_waveform(magnitude, phase, hop_length=512)
+print("Reconstructed audio shape:", reconstructed_audio.shape)
 ```
 
 ---
@@ -174,14 +179,15 @@ print("Tonnetz shape:", tonnetz.shape)
 
 ### 5. `processor.py` - Audio Processor Class
 
-The `AudioProcessor` class provides centralized access to all core functions in SAPPL, acting as an adaptable interface for loading, saving, transforming, and extracting features from audio files. It dynamically incorporates new functions, making it future-proof for upcoming enhancements in SAPPL.
+The `AudioProcessor` class provides centralized access to all core functions in SAPPL, acting as an adaptable interface for loading, saving, transforming, and extracting features from audio files. It simplifies audio processing by allowing users to set processing parameters once at initialization (e.g., `n_fft`, `hop_length`, `n_mels`), reducing the need to pass them repeatedly for each function call.
 
 #### Example
 
 ```python
 from sappl.processor import AudioProcessor
 
-processor = AudioProcessor(sample_rate=16000, max_length=5.0)
+# Initialize AudioProcessor with default parameters, setting them once
+processor = AudioProcessor(sample_rate=16000, max_length=5.0, n_fft=1024, hop_length=256, n_mels=40)
 
 # Load and preprocess audio
 audio = processor.load_audio("path/to/file.wav")
@@ -196,6 +202,11 @@ print("MFCC features shape:", mfcc_features.shape)
 stft_matrix = processor.stft(normalized_audio)
 mel_spectrogram = processor.compute_mel_spectrogram(normalized_audio)
 print("Mel Spectrogram shape:", mel_spectrogram.shape)
+
+# Reconstruct waveform from magnitude and phase
+magnitude, phase = processor.magphase(stft_matrix)
+reconstructed_audio = processor.reconstruct_waveform(magnitude, phase)
+print("Reconstructed audio shape:", reconstructed_audio.shape)
 ```
 
 ---

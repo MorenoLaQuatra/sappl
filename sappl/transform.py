@@ -138,6 +138,30 @@ def compute_mel_spectrogram(audio, sample_rate=16000, n_fft=2048, hop_length=512
     return librosa.power_to_db(mel_spectrogram, ref=np.max).T  # Convert to dB and transpose to (T, F)
 
 
+def reconstruct_waveform(magnitude, phase, hop_length=512, win_length=None):
+    """
+    Reconstructs the waveform from magnitude and phase components.
+
+    Args:
+        magnitude (np.ndarray): Magnitude spectrogram (T, F).
+        phase (np.ndarray): Phase spectrogram (T, F).
+        hop_length (int): Number of audio samples between successive STFT columns. Default is 512.
+        win_length (int): Each frame of audio will be windowed by `win_length`. Default is None.
+
+    Returns:
+        np.ndarray: Reconstructed audio waveform.
+    """
+    # Transpose magnitude and phase to (F, T) for compatibility with istft
+    magnitude = magnitude.T
+    phase = phase.T
+
+    # Combine magnitude and phase to form the complex-valued STFT matrix
+    stft_matrix = magnitude * np.exp(1j * phase)
+
+    # Perform inverse STFT to get back the waveform
+    return librosa.istft(stft_matrix, hop_length=hop_length, win_length=win_length)
+
+
 if __name__ == "__main__":
     # Example usage for testing purposes
     from sappl.io import load_audio, save_audio
@@ -158,6 +182,15 @@ if __name__ == "__main__":
     print("Magnitude shape:", magnitude.shape)
     print("Phase shape:", phase.shape)
     print()
+    
+    # Reconstruct waveform from magnitude and phase
+    reconstructed_audio = reconstruct_waveform(magnitude, phase, hop_length=512)
+    print("Reconstructed audio shape:", reconstructed_audio.shape)
+
+    # Save the reconstructed audio
+    test_save_path = "../samples/music_sample_reconstructed.wav"
+    save_audio(test_save_path, reconstructed_audio, sample_rate=16000)
+    print(f"Reconstructed audio saved to {test_save_path}")
 
     # Convert magnitude to dB scale
     magnitude_db = amplitude_to_db(magnitude)
