@@ -23,6 +23,7 @@ class AudioProcessor:
                  hop_length=512, 
                  win_length=None, 
                  n_mels=128, 
+                 n_mfcc=13,
                  f_min=0.0, 
                  f_max=None, 
                  center=False, 
@@ -52,6 +53,7 @@ class AudioProcessor:
         self.hop_length = hop_length
         self.win_length = win_length or n_fft
         self.n_mels = n_mels
+        self.n_mfcc = n_mfcc
         self.f_min = f_min
         self.f_max = f_max or sample_rate / 2
         self.center = center
@@ -124,7 +126,7 @@ class AudioProcessor:
     
     # --- Feature Extraction ---
     def extract_mfcc(self, audio):
-        return feature_extraction.extract_mfcc(audio, sample_rate=self.sample_rate, n_mfcc=13, n_fft=self.n_fft, hop_length=self.hop_length)
+        return feature_extraction.extract_mfcc(audio, sample_rate=self.sample_rate, n_mfcc=self.n_mfcc, n_fft=self.n_fft, hop_length=self.hop_length)
 
     def extract_chroma(self, audio):
         return feature_extraction.extract_chroma(audio, sample_rate=self.sample_rate, n_fft=self.n_fft, hop_length=self.hop_length)
