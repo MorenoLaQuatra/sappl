@@ -23,6 +23,9 @@ def stft(audio, n_fft=2048, hop_length=512, win_length=None, center=False, pad_m
     Returns:
         np.ndarray: STFT of shape (T, F), where T is the number of time steps, and F is the number of frequency bins.
     """
+    if TORCH_AVAILABLE and torch.is_tensor(audio):
+        audio = audio.numpy()
+        
     stft_matrix = librosa.stft(y=audio, n_fft=n_fft, hop_length=hop_length, win_length=win_length, center=center, pad_mode=pad_mode)
     return stft_matrix.T  # Transpose to (T, F)
 
@@ -40,6 +43,8 @@ def istft(stft_matrix, hop_length=512, win_length=None, center=False):
     Returns:
         np.ndarray: Reconstructed audio time series.
     """
+    if TORCH_AVAILABLE and torch.is_tensor(stft_matrix):
+        stft_matrix = stft_matrix.numpy()
     return librosa.istft(stft_matrix.T, hop_length=hop_length, win_length=win_length, center=center)  # Transpose back to (F, T) for iSTFT
 
 
@@ -54,6 +59,8 @@ def magphase(stft_matrix):
     Returns:
         tuple: (magnitude, phase) both of shape (T, F).
     """
+    if TORCH_AVAILABLE and torch.is_tensor(stft_matrix):
+        stft_matrix = stft_matrix.numpy()
     magnitude, phase = librosa.magphase(stft_matrix.T)
     return magnitude.T, phase.T  # Transpose each to (T, F)
 
@@ -68,7 +75,10 @@ def db_to_power(spectrogram_db, ref=1.0):
 
     Returns:
         np.ndarray: Spectrogram in power scale (T, F).
-    """
+    """     
+    if TORCH_AVAILABLE and torch.is_tensor(spectrogram_db):
+        spectrogram_db = spectrogram_db.numpy()
+        
     return librosa.db_to_power(spectrogram_db, ref=ref)
 
 
@@ -83,6 +93,9 @@ def power_to_db(spectrogram, ref=1.0):
     Returns:
         np.ndarray: Spectrogram in dB scale (T, F).
     """
+    if TORCH_AVAILABLE and torch.is_tensor(spectrogram):
+        spectrogram = spectrogram.numpy()
+        
     return librosa.power_to_db(spectrogram.T, ref=ref).T  # Convert and transpose to (T, F)
 
 
@@ -97,6 +110,8 @@ def amplitude_to_db(spectrogram_amplitude, ref=1.0):
     Returns:
         np.ndarray: Spectrogram in dB scale (T, F).
     """
+    if TORCH_AVAILABLE and torch.is_tensor(spectrogram_amplitude):
+        spectrogram_amplitude = spectrogram_amplitude.numpy()
     return librosa.amplitude_to_db(spectrogram_amplitude.T, ref=ref).T  # Convert and transpose to (T, F)
 
 
@@ -111,6 +126,8 @@ def db_to_amplitude(spectrogram_db, ref=1.0):
     Returns:
         np.ndarray: Spectrogram in amplitude scale (T, F).
     """
+    if TORCH_AVAILABLE and torch.is_tensor(spectrogram_db):
+        spectrogram_db = spectrogram_db.numpy()
     return librosa.db_to_amplitude(spectrogram_db, ref=ref)
 
 
@@ -132,6 +149,10 @@ def compute_mel_spectrogram(audio, sample_rate=16000, n_fft=2048, hop_length=512
     Returns:
         np.ndarray: Mel spectrogram in dB scale (T, F), where T is time steps and F is Mel bins.
     """
+    
+    if TORCH_AVAILABLE and torch.is_tensor(audio):
+        audio = audio.numpy()
+    
     mel_spectrogram = librosa.feature.melspectrogram(
         y=audio,
         sr=sample_rate,
@@ -161,6 +182,10 @@ def reconstruct_waveform(magnitude, phase, hop_length=512, win_length=None, cent
     Returns:
         np.ndarray: Reconstructed audio waveform.
     """
+    
+    if TORCH_AVAILABLE and torch.is_tensor(magnitude): magnitude = magnitude.numpy()
+    if TORCH_AVAILABLE and torch.is_tensor(phase): phase = phase.numpy()
+    
     # Transpose magnitude and phase to (F, T) for compatibility with istft
     magnitude = magnitude.T
     phase = phase.T

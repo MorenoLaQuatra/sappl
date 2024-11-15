@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="sappl",
-    version="0.1.1",
+    version="0.1.3",
     author="Moreno La Quatra",
     author_email="moreno.laquatra@gmail.com",
     description="Simple Audio Pre-Processing Library for deep learning audio applications",
